@@ -1,0 +1,33 @@
+---
+description: This rule directs the agent to consult documents within the .cursor/planning/ directory when tasked with significant feature development, major design changes, or architectural modifications. These documents, typically Product Requirement Documents (PRDs) or design specifications, provide critical context on strategic direction, scope, and technical considerations for large-scale initiatives. Applying this rule ensures that the agent's contributions align with established plans, prevent redundant effort, and maintain consistency with the project's vision, especially before making substantial code alterations or proposing new architectural patterns.
+globs:
+alwaysApply: false
+---
+# Consult Planning Documents for Major Changes
+
+## Critical Rules
+
+- Before initiating work on significant feature requests, major design alterations, or substantial architectural changes, proactively examine all documents located in the `.cursor/planning/` directory.
+- These planning documents (e.g., PRDs, design docs) contain essential information regarding the project's roadmap, objectives, and specifications for large-scale initiatives.
+- Prioritize understanding the content of these documents to ensure your proposed changes or implementations are consistent with the overall project strategy and to avoid conflicts with planned features or architectural decisions.
+- If the user's request seems to overlap with or impact a large planned feature described in these documents, explicitly mention the relevant planning document and how the request relates to it.
+
+## Examples
+
+<example>
+  User: "We need to overhaul the entire user authentication system to support OAuth2 and integrate with three new identity providers."
+  Agent: "This sounds like a significant architectural change. I will first review the documents in the `.cursor/planning/` directory to see if there are any existing plans or PRDs related to authentication system changes. Then I will proceed with outlining a plan for this overhaul."
+  (Agent then uses `list_dir` for `.cursor/planning/` and `read_file` for relevant files.)
+</example>
+
+<example type="invalid">
+  User: "Please fix this typo in the button label on the login page."
+  Agent: "Okay, I will first review all documents in `.cursor/planning/` before fixing the typo."
+  (This is invalid because fixing a typo is not a significant feature or design change requiring review of all planning documents.)
+</example>
+
+<example type="invalid">
+  User: "Let's redesign the entire partner card component with a new data structure."
+  Agent: "Okay, I will start by modifying the `PartnerCard.tsx` component and updating the `Partner` type."
+  (This is invalid because the agent did not first consult the planning documents, such as `partner-components-typesafety-prd.mdc` found in `.cursor/planning/`, which might contain relevant information about partner card design and data structures.)
+</example>

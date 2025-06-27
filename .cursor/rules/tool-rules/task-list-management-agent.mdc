@@ -1,0 +1,94 @@
+---
+description: Apply this rule when creating or managing task lists in markdown files to track project progress. This includes creating new task list files (TASKS.md or feature-specific names), updating task statuses, maintaining relevant files sections, and documenting implementation details. Use this rule when starting new features, implementing tasks, or when the user requests task tracking. The rule ensures consistent task list structure, proper maintenance of task states, and comprehensive documentation of implementation progress.
+globs:
+alwaysApply: false
+---
+# Task List Management Agent
+
+## Critical Rules
+
+- Create task lists in markdown files at project root (e.g., `TASKS.md` or feature-specific names like `ASSISTANT_CHAT.md`)
+- Structure task lists with sections: Completed Tasks, In Progress Tasks, Future Tasks, Implementation Plan, and Relevant Files
+- Update task status by changing `[ ]` to `[x]` when completed
+- Move tasks between sections as their status changes
+- Maintain "Relevant Files" section with accurate paths and descriptions
+- Document implementation details including architecture decisions and technical components
+- Check current task status before implementing next task
+- Update task list immediately after implementing significant components
+
+## Task List Structure
+
+```markdown
+# Feature Name Implementation
+
+Brief description of the feature and its purpose.
+
+## Completed Tasks
+
+- [x] Task 1 that has been completed
+- [x] Task 2 that has been completed
+
+## In Progress Tasks
+
+- [ ] Task 3 currently being worked on
+- [ ] Task 4 to be completed soon
+
+## Future Tasks
+
+- [ ] Task 5 planned for future implementation
+- [ ] Task 6 planned for future implementation
+
+## Implementation Plan
+
+Detailed description of how the feature will be implemented.
+
+### Relevant Files
+
+- path/to/file1.ts - Description of purpose
+- path/to/file2.ts - Description of purpose
+```
+
+## Task Management Process
+
+- Before implementing: Check which task to implement next
+- During implementation: Add newly discovered tasks as needed
+- After implementation: Mark task complete and update relevant files
+- Document architecture decisions and data flow in Implementation Plan
+- Include environment configuration requirements
+
+## Examples
+
+<example>
+When completing a task, update from:
+
+## In Progress Tasks
+- [ ] Implement database schema
+- [ ] Create API endpoints
+
+## Completed Tasks
+- [x] Set up project structure
+
+To:
+
+## In Progress Tasks
+- [ ] Create API endpoints
+
+## Completed Tasks
+- [x] Set up project structure
+- [x] Implement database schema
+
+### Relevant Files
+- src/db/schema.ts - Database schema definitions ✅
+- src/db/migrations/001_initial.sql - Initial migration ✅
+</example>
+
+<example type="invalid">
+Incorrect task list management:
+
+## Tasks
+- Done: Setup project
+- TODO: Create API
+- Maybe: Add tests
+
+Missing sections, improper formatting, no relevant files tracking, and no implementation details.
+</example>
