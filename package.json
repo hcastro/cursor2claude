@@ -2,13 +2,21 @@
   "name": "cursor2claude",
   "version": "0.0.0-wip.0",
   "description": "CLI that syncs Cursor .mdc rules into Claude Code’s CLAUDE.md",
-  "keywords": ["cursor", "claude-code", "cli", "rules", "sync"],
+  "keywords": [
+    "cursor",
+    "claude-code",
+    "cli",
+    "rules",
+    "sync"
+  ],
   "license": "MIT",
   "type": "module",
   "bin": {
     "cursor2claude": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "tag": "wip",
     "access": "public"
@@ -16,17 +24,27 @@
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^14.0.0",
+    "common-tags": "^1.8.2",
     "fs-extra": "^11.3.0",
     "yaml": "^2.8.0"
   },
   "devDependencies": {
+    "@types/common-tags": "^1.8.4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.15.30",
+    "jest": "^30.0.2",
+    "prettier": "^3.6.1",
+    "ts-jest": "^29.4.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc -p .",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "format": "prettier --write \"src/**/*.ts\" \"*.json\" \"*.md\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"*.json\" \"*.md\"",
     "prepare": "pnpm run build"
   },
   "engines": {
