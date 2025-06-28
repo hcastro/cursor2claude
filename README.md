@@ -112,4 +112,3 @@ cursor2claude transforms your Cursor rules into a single CLAUDE.md file:
 | **Jest 30**                 | Unit tests                  |
 | **pnpm**                    | Package manager             |
 | **ESLint 9 + Prettier 3**   | Code quality                |
-

@@ -179,7 +179,7 @@ function normalizeGlobs(globs?: string[] | string): string[] {
 
 /**
  * Determine rule type based solely on frontmatter fields.
- * 
+ *
  * @param rule - Parsed rule containing frontmatter and content
  * @returns Rule type matching Cursor's implementation:
  *   - 'always': alwaysApply=true (runs on every chat/cmd+k)
@@ -192,18 +192,18 @@ function getRuleType(rule: ParsedRule): string {
   if (rule.frontmatter.alwaysApply === true) {
     return 'always'
   }
-  
+
   // Auto-Select rule: triggered by glob patterns
   const globs = normalizeGlobs(rule.frontmatter.globs)
   if (globs.length > 0) {
     return 'auto'
   }
-  
+
   // Agent-Selected rule: has description for context
   if (rule.frontmatter.description) {
     return 'agent'
   }
-  
+
   // Manual rule: no frontmatter fields
   return 'manual'
 }
@@ -235,10 +235,10 @@ function categorize(rules: ParsedRule[]): Map<string, ParsedRule[]> {
 /**
  * Determine whether a rule's content should be inlined directly in CLAUDE.md
  * or referenced via @import directive.
- * 
+ *
  * @param rule - Parsed rule to evaluate
  * @returns true if content should be inlined, false for import reference
- * 
+ *
  * Decision criteria:
  * - Manual rules: Never inlined (user-triggered)
  * - Always rules: Inlined if <= 10 lines
@@ -249,22 +249,22 @@ function categorize(rules: ParsedRule[]): Map<string, ParsedRule[]> {
 function shouldInline(rule: ParsedRule): boolean {
   const lineCount = rule.content.split('\n').length
   const type = getRuleType(rule)
-  
+
   // Manual rules are never inlined (they're manually triggered)
   if (type === 'manual') return false
-  
+
   // Always rules should be inlined if short enough
   if (type === 'always' && lineCount <= INLINE_THRESHOLD_LINES) return true
-  
+
   // Agent-selected rules with descriptions should use imports for clarity
   if (type === 'agent' && rule.frontmatter.description) return false
-  
+
   // Auto rules are typically file-specific and better as imports
   if (type === 'auto') return false
-  
+
   // Very short rules can be inlined regardless of type
   if (lineCount <= VERY_SHORT_THRESHOLD_LINES) return true
-  
+
   return false
 }
 
@@ -274,11 +274,11 @@ function shouldInline(rule: ParsedRule): boolean {
 
 /**
  * Generate the complete CLAUDE.md content from parsed rules.
- * 
+ *
  * @param rules - Array of parsed rule files to include
  * @param existing - Current CLAUDE.md content (if exists)
  * @returns Complete CLAUDE.md content with rules organized by type
- * 
+ *
  * The generated structure includes:
  * - Header comment
  * - Always-Apply Rules section (global context)
@@ -292,7 +292,7 @@ function renderClaudeMd(rules: ParsedRule[], existing?: string): string {
   const sections: string[] = [CLAUDE_MD_HEADER, '']
 
   const cats = categorize(rules)
-  
+
   /* ---------- Always Rules (Global Context) ---------- */
   const always = cats.get('always')!
   if (always.length) {
@@ -314,9 +314,7 @@ function renderClaudeMd(rules: ParsedRule[], existing?: string): string {
     auto.forEach((rule) => {
       const globs = normalizeGlobs(rule.frontmatter.globs)
       const globsStr = globs.length ? globs.join(', ') : 'No globs specified'
-      sections.push(
-        `@${rule.relativePath} <!-- Applies to: ${globsStr} -->`
-      )
+      sections.push(`@${rule.relativePath} <!-- Applies to: ${globsStr} -->`)
     })
     sections.push('')
   }
@@ -335,7 +333,7 @@ function renderClaudeMd(rules: ParsedRule[], existing?: string): string {
     })
     sections.push('')
   }
-  
+
   /* ---------- Manual Rules ---------- */
   const manual = cats.get('manual')!
   if (manual.length) {
@@ -345,7 +343,6 @@ function renderClaudeMd(rules: ParsedRule[], existing?: string): string {
     })
     sections.push('')
   }
-
 
   /* ---------- Marker & User Content ---------- */
   sections.push(CLAUDE_MD_MARKER)
@@ -390,14 +387,14 @@ function logVerbose(message: string): void {
 
 /**
  * Main synchronization function that discovers Cursor rules and generates CLAUDE.md.
- * 
+ *
  * This function:
  * 1. Ensures .cursor/rules directory exists (creates example if missing)
  * 2. Discovers all .md/.mdc files recursively
  * 3. Parses frontmatter and categorizes rules by type
  * 4. Generates CLAUDE.md with appropriate imports/inlines
  * 5. Preserves user content below the marker line
- * 
+ *
  */
 async function sync(): Promise<void> {
   const rulesDir = join(process.cwd(), '.cursor', 'rules')
@@ -408,9 +405,7 @@ async function sync(): Promise<void> {
 
   /* 1. Ensure rules directory exists */
   if (!existsSync(rulesDir)) {
-    log(
-      chalk.yellow('⚠️  .cursor/rules not found – scaffolding example.')
-    )
+    log(chalk.yellow('⚠️  .cursor/rules not found – scaffolding example.'))
     mkdirSync(rulesDir, { recursive: true })
     logVerbose('Created .cursor/rules directory')
 
@@ -423,16 +418,16 @@ async function sync(): Promise<void> {
       Prefer \`interface\` over \`type\` for data shapes.
     `
     writeFileSync(join(rulesDir, 'typescript.mdc'), demo)
-    log(
-      chalk.green('✔ Created example rule at .cursor/rules/typescript.mdc')
-    )
+    log(chalk.green('✔ Created example rule at .cursor/rules/typescript.mdc'))
   }
 
   /* 2. Discover & parse */
   log(chalk.blue('🔍 Scanning rules…'))
   const files = await findRuleFiles(rulesDir)
-  logVerbose(`Found ${files.length} rule files: ${files.map(f => relative(process.cwd(), f)).join(', ')}`)
-  
+  logVerbose(
+    `Found ${files.length} rule files: ${files.map((f) => relative(process.cwd(), f)).join(', ')}`
+  )
+
   if (!files.length) {
     log(chalk.yellow('No rule files found – nothing to sync.'))
     return
@@ -451,21 +446,27 @@ async function sync(): Promise<void> {
     log(
       `${inline ? chalk.yellow('[inline]') : chalk.blue('[import]')} ${rule.relativePath}`
     )
-    logVerbose(`  ↳ Type: ${type}, Lines: ${rule.content.split('\n').length}, Inline: ${inline}`)
+    logVerbose(
+      `  ↳ Type: ${type}, Lines: ${rule.content.split('\n').length}, Inline: ${inline}`
+    )
   })
 
   /* 3. Read existing CLAUDE.md */
   const existing = existsSync(claudePath)
     ? readFileSync(claudePath, 'utf8')
     : undefined
-  
-  logVerbose(existing ? 'Found existing CLAUDE.md, preserving user content' : 'No existing CLAUDE.md found')
+
+  logVerbose(
+    existing
+      ? 'Found existing CLAUDE.md, preserving user content'
+      : 'No existing CLAUDE.md found'
+  )
 
   /* 4. Render & write */
   const newContent = renderClaudeMd(parsed, existing)
   writeFileSync(claudePath, newContent)
   logVerbose(`Wrote ${newContent.split('\n').length} lines to CLAUDE.md`)
-  
+
   log(chalk.green(`✨ CLAUDE.md updated with ${parsed.length} rule(s)`))
 }
 
@@ -495,16 +496,14 @@ program
 program
   .command('sync')
   .description('Generate / refresh CLAUDE.md in the project root.')
-  .action(
-    () => {
-      const opts = program.opts()
-      setVerbose(opts.verbose || false)
-      void sync().catch((err) => {
-        console.error(chalk.red('💥'), err)
-        process.exit(1)
-      })
-    }
-  )
+  .action(() => {
+    const opts = program.opts()
+    setVerbose(opts.verbose || false)
+    void sync().catch((err) => {
+      console.error(chalk.red('💥'), err)
+      process.exit(1)
+    })
+  })
 
 program
   .command('watch')
@@ -514,7 +513,7 @@ program
   .action(async () => {
     const opts = program.opts()
     setVerbose(opts.verbose || false)
-    
+
     await sync()
 
     const dir = join(process.cwd(), '.cursor', 'rules')
@@ -526,9 +525,7 @@ program
         filename &&
         SUPPORTED_EXTENSIONS.some((ext) => filename.endsWith(ext))
       ) {
-        log(
-          chalk.yellow(`↻  Change detected in ${filename} – re‑syncing…`)
-        )
+        log(chalk.yellow(`↻  Change detected in ${filename} – re‑syncing…`))
         logVerbose(`File changed: ${filename}, Event: ${_evt}`)
         await sync()
       }
@@ -543,10 +540,10 @@ program
   .action(async () => {
     const opts = program.opts()
     setVerbose(opts.verbose || false)
-    
+
     const dir = join(process.cwd(), '.cursor', 'rules')
     logVerbose(`Checking rules directory: ${dir}`)
-    
+
     if (!existsSync(dir)) {
       console.error(chalk.red('No .cursor/rules directory in this project.'))
       process.exitCode = 2
@@ -554,8 +551,10 @@ program
     }
 
     const files = await findRuleFiles(dir)
-    logVerbose(`Discovered ${files.length} files: ${files.map(f => relative(process.cwd(), f)).join(', ')}`)
-    
+    logVerbose(
+      `Discovered ${files.length} files: ${files.map((f) => relative(process.cwd(), f)).join(', ')}`
+    )
+
     if (!files.length) {
       log(chalk.yellow('No rule files found.'))
       process.exitCode = 3
@@ -567,26 +566,25 @@ program
       const rule = parseRuleFile(await readFile(f, 'utf8'), f)
       const type = getRuleType(rule)
       const typeLabels: Record<string, string> = {
-        'always': 'Always (Global)',
-        'auto': 'Auto-Select', 
-        'agent': 'Agent-Selected',
-        'manual': 'Manual'
+        always: 'Always (Global)',
+        auto: 'Auto-Select',
+        agent: 'Agent-Selected',
+        manual: 'Manual',
       }
       const typeLabel = typeLabels[type] || type
       const lineCount = rule.content.split('\n').length
-      
+
       log(
         `${shouldInline(rule) ? chalk.yellow('[inline]') : chalk.blue('[import]')} ${rule.relativePath}`
       )
       log(chalk.gray(`  ↳ Type: ${typeLabel}`))
-      logVerbose(`  ↳ Lines: ${lineCount}, File size: ${rule.rawContent.length} bytes`)
+      logVerbose(
+        `  ↳ Lines: ${lineCount}, File size: ${rule.rawContent.length} bytes`
+      )
       if (rule.frontmatter.description)
         log(chalk.gray(`  ↳ ${rule.frontmatter.description}`))
       const globs = normalizeGlobs(rule.frontmatter.globs)
-      if (globs.length)
-        log(
-          chalk.gray(`  ↳ globs: ${globs.join(', ')}`)
-        )
+      if (globs.length) log(chalk.gray(`  ↳ globs: ${globs.join(', ')}`))
       log('')
     }
   })
