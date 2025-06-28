@@ -1,6 +1,6 @@
 {
   "name": "cursor2claude",
-  "version": "0.0.0-wip.0",
+  "version": "0.1.0",
   "description": "CLI that syncs Cursor .mdc rules into Claude Code’s CLAUDE.md",
   "keywords": [
     "cursor",
@@ -9,6 +9,15 @@
     "rules",
     "sync"
   ],
+  "homepage": "https://github.com/henrycastro/cursor2claude#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/henrycastro/cursor2claude.git"
+  },
+  "bugs": {
+    "url": "https://github.com/henrycastro/cursor2claude/issues"
+  },
+  "author": "Henry Castro",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -18,7 +27,7 @@
     "dist"
   ],
   "publishConfig": {
-    "tag": "wip",
+    "tag": "latest",
     "access": "public"
   },
   "dependencies": {
