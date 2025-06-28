@@ -1,7 +1,7 @@
 ---
 description: For maintaining code quality, documentation, and explanations
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 <!-- https://github.com/PatrickJS/awesome-cursorrules/blob/main/rules/javascript-typescript-code-quality-cursorrules-pro/.cursorrules -->
 

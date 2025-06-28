@@ -1,6 +1,6 @@
 ---
-description: This rule is essential for maintaining consistency and quality in rule creation across the codebase. It must be followed whenever: (1) A user requests a new rule to be created, (2) An existing rule needs modification, (3) The user asks to remember certain behaviors or patterns, or (4) Future behavior changes are requested. This rule ensures proper organization, clear documentation, and effective rule application by defining standard formats, naming conventions, and content requirements. It's particularly crucial for maintaining the rule hierarchy, ensuring rules are discoverable by the AI, and preserving the effectiveness of the rule-based system. The rule system is fundamental to project consistency, code quality, and automated assistance effectiveness.
-globs: 
+description: This rule is essential for maintaining consistency and quality in rule creation across the codebase. It must be followed whenever (1) A user requests a new rule to be created, (2) An existing rule needs modification, (3) The user asks to remember certain behaviors or patterns, or (4) Future behavior changes are requested. This rule ensures proper organization, clear documentation, and effective rule application by defining standard formats, naming conventions, and content requirements. It's particularly crucial for maintaining the rule hierarchy, ensuring rules are discoverable by the AI, and preserving the effectiveness of the rule-based system. The rule system is fundamental to project consistency, code quality, and automated assistance effectiveness.
+globs: []
 alwaysApply: true
 ---
 # Cursor Rules Format
