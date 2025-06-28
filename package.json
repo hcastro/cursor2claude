@@ -1,7 +1,7 @@
 {
   "name": "cursor2claude",
   "version": "0.1.0",
-  "description": "CLI that syncs Cursor .mdc rules into Claude Code’s CLAUDE.md",
+  "description": "CLI that syncs Cursor rules into Claude Code’s CLAUDE.md",
   "keywords": [
     "cursor",
     "claude-code",
@@ -9,13 +9,13 @@
     "rules",
     "sync"
   ],
-  "homepage": "https://github.com/henrycastro/cursor2claude#readme",
+  "homepage": "https://github.com/hcastro/cursor2claude#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/henrycastro/cursor2claude.git"
+    "url": "https://github.com/hcastro/cursor2claude.git"
   },
   "bugs": {
-    "url": "https://github.com/henrycastro/cursor2claude/issues"
+    "url": "https://github.com/hcastro/cursor2claude/issues"
   },
   "author": "Henry Castro",
   "license": "MIT",
