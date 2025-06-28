@@ -1,10 +1,6 @@
-# cursor2claude ⚙️ → 📜
+# cursor2claude
 
 > **Translate Cursor IDE rules into a single, tidy `CLAUDE.md` so Claude Code understands your project.**
-
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![CI](https://github.com/<ORG>/cursor2claude/actions/workflows/ci.yml/badge.svg)](https://github.com/<ORG>/cursor2claude/actions)
-[![npm](https://img.shields.io/npm/v/cursor2claude.svg)](https://www.npmjs.com/package/cursor2claude)
 
 ---
 
@@ -16,26 +12,12 @@ _Claude Code_ only looks at one Markdown file – `CLAUDE.md`. Keeping those in 
 **cursor2claude** is a tiny CLI that:
 
 1. Scans `.cursor/rules/**/*.{md,mdc}` at any depth
-2. Categorises rules (always‑apply • context‑specific • other)
+2. Categorizes rules (always‑apply • context‑specific • other)
 3. Decides whether to **inline** short / critical rules or **import** long ones
 4. Writes / updates `CLAUDE.md`, preserving any notes below a marker
 5. Offers `sync`, `watch`, and `status` commands for smooth DX.
 
-Write a rule once ⇒ both editors follow it.
-
----
-
-## 🛠 Tech Stack
-
-| Tool                        | Purpose                     |
-| --------------------------- | --------------------------- |
-| **Node 22+ (TypeScript 5)** | Runtime & language          |
-| **Commander**               | CLI surface                 |
-| **yaml**                    | Robust front‑matter parsing |
-| **chalk**                   | Colourised logs             |
-| **Jest 30**                 | Unit tests                  |
-| **pnpm**                    | Package manager             |
-| **ESLint 9 + Prettier 3**   | Code quality                |
+Write a rule once ⇒ both AIs follow it.
 
 ---
 
@@ -69,3 +51,59 @@ npx cursor2claude sync   # or add to package.json scripts
 yarn add -D cursor2claude
 yarn cursor2claude sync
 ```
+
+---
+
+## 📋 Commands
+
+```bash
+cursor2claude sync    # One-time sync of rules to CLAUDE.md
+cursor2claude watch   # Watch for changes and auto-sync
+cursor2claude status  # Check current sync status
+```
+
+---
+
+## 🔧 How It Works
+
+1. **Discovers** all `.md` and `.mdc` files in `.cursor/rules/`
+2. **Parses** YAML frontmatter to understand rule properties
+3. **Categorizes** rules based on `alwaysApply` and `description` fields
+4. **Generates** a clean `CLAUDE.md` with:
+   - Auto-generated header
+   - Organized rule imports
+   - Preserved user content below marker
+
+### Rule Types
+
+- **Always-Apply Rules**: Global context rules (`alwaysApply: true`)
+- **Agent-Selected Rules**: Context-specific rules with descriptions
+- **Other Rules**: Manual or auto rules without descriptions
+
+### Example Directory Structure
+
+```
+.cursor/
+└── rules/
+    ├── core-rules/
+    │   ├── code-quality.mdc          # alwaysApply: true
+    │   └── rule-generator-agent.mdc  # alwaysApply: true
+    └── tool-rules/
+        ├── git-commit-assistant.mdc  # Agent-selected
+        └── task-list-management.mdc  # Agent-selected
+```
+
+---
+
+## 🛠 Tech Stack
+
+| Tool                        | Purpose                     |
+| --------------------------- | --------------------------- |
+| **Node 22+ (TypeScript 5)** | Runtime & language          |
+| **Commander**               | CLI surface                 |
+| **yaml**                    | Robust front‑matter parsing |
+| **chalk**                   | Colourised logs             |
+| **Jest 30**                 | Unit tests                  |
+| **pnpm**                    | Package manager             |
+| **ESLint 9 + Prettier 3**   | Code quality                |
+
