@@ -80,17 +80,23 @@ cursor2claude status  # Check current sync status
 - **Agent-Selected Rules**: Context-specific rules with descriptions
 - **Other Rules**: Manual or auto rules without descriptions
 
-### Example Directory Structure
+### How It Works
+
+cursor2claude transforms your Cursor rules into a single CLAUDE.md file:
 
 ```
-.cursor/
-└── rules/
-    ├── core-rules/
-    │   ├── code-quality.mdc          # alwaysApply: true
-    │   └── rule-generator-agent.mdc  # alwaysApply: true
-    └── tool-rules/
-        ├── git-commit-assistant.mdc  # Agent-selected
-        └── task-list-management.mdc  # Agent-selected
+📁 .cursor/rules/                    ➜    📄 CLAUDE.md
+├── 📁 core-rules/                        ┌─────────────────────────────┐
+│   └── 📄 code-quality.mdc               │ ## 🌍 Always-Apply Rules    │
+│       (alwaysApply: true)               │ @.cursor/rules/core-rules/  │
+│                                         │   code-quality.mdc          │
+└── 📁 tool-rules/                        │                             │
+    ├── 📄 git-commit-assistant.mdc       │ ## 🤖 Agent-Selected Rules  │
+    │   (agent-selected)                  │ @.cursor/rules/tool-rules/  │
+    └── 📄 task-list-management.mdc       │   git-commit-assistant.mdc  │
+        (agent-selected)                  │ @.cursor/rules/tool-rules/  │
+                                          │   task-list-management.mdc  │
+                                          └─────────────────────────────┘
 ```
 
 ---
