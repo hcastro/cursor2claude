@@ -365,6 +365,26 @@ function renderClaudeMd(rules: ParsedRule[], existing?: string): string {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Logging Utilities                                                 */
+/* ------------------------------------------------------------------ */
+
+let isVerbose = false
+
+function setVerbose(verbose: boolean): void {
+  isVerbose = verbose
+}
+
+function log(message: string): void {
+  console.log(message)
+}
+
+function logVerbose(message: string): void {
+  if (isVerbose) {
+    console.log(chalk.gray(`[verbose] ${message}`))
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Sync Workflow                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -383,12 +403,16 @@ async function sync(): Promise<void> {
   const rulesDir = join(process.cwd(), '.cursor', 'rules')
   const claudePath = join(process.cwd(), 'CLAUDE.md')
 
+  logVerbose(`Looking for rules in: ${rulesDir}`)
+  logVerbose(`Target CLAUDE.md path: ${claudePath}`)
+
   /* 1. Ensure rules directory exists */
   if (!existsSync(rulesDir)) {
-    console.log(
+    log(
       chalk.yellow('⚠️  .cursor/rules not found – scaffolding example.')
     )
     mkdirSync(rulesDir, { recursive: true })
+    logVerbose('Created .cursor/rules directory')
 
     const demo = stripIndent`
       ---
@@ -399,37 +423,50 @@ async function sync(): Promise<void> {
       Prefer \`interface\` over \`type\` for data shapes.
     `
     writeFileSync(join(rulesDir, 'typescript.mdc'), demo)
-    console.log(
+    log(
       chalk.green('✔ Created example rule at .cursor/rules/typescript.mdc')
     )
   }
 
   /* 2. Discover & parse */
-  console.log(chalk.blue('🔍 Scanning rules…'))
+  log(chalk.blue('🔍 Scanning rules…'))
   const files = await findRuleFiles(rulesDir)
+  logVerbose(`Found ${files.length} rule files: ${files.map(f => relative(process.cwd(), f)).join(', ')}`)
+  
   if (!files.length) {
-    console.log(chalk.yellow('No rule files found – nothing to sync.'))
+    log(chalk.yellow('No rule files found – nothing to sync.'))
     return
   }
 
   const parsed = await Promise.all(
-    files.map(async (f) => parseRuleFile(await readFile(f, 'utf8'), f))
+    files.map(async (f) => {
+      logVerbose(`Parsing: ${relative(process.cwd(), f)}`)
+      return parseRuleFile(await readFile(f, 'utf8'), f)
+    })
   )
 
-  parsed.forEach((rule) =>
-    console.log(
-      `${shouldInline(rule) ? chalk.yellow('[inline]') : chalk.blue('[import]')} ${rule.relativePath}`
+  parsed.forEach((rule) => {
+    const type = getRuleType(rule)
+    const inline = shouldInline(rule)
+    log(
+      `${inline ? chalk.yellow('[inline]') : chalk.blue('[import]')} ${rule.relativePath}`
     )
-  )
+    logVerbose(`  ↳ Type: ${type}, Lines: ${rule.content.split('\n').length}, Inline: ${inline}`)
+  })
 
   /* 3. Read existing CLAUDE.md */
   const existing = existsSync(claudePath)
     ? readFileSync(claudePath, 'utf8')
     : undefined
+  
+  logVerbose(existing ? 'Found existing CLAUDE.md, preserving user content' : 'No existing CLAUDE.md found')
 
   /* 4. Render & write */
-  writeFileSync(claudePath, renderClaudeMd(parsed, existing))
-  console.log(chalk.green(`✨ CLAUDE.md updated with ${parsed.length} rule(s)`))
+  const newContent = renderClaudeMd(parsed, existing)
+  writeFileSync(claudePath, newContent)
+  logVerbose(`Wrote ${newContent.split('\n').length} lines to CLAUDE.md`)
+  
+  log(chalk.green(`✨ CLAUDE.md updated with ${parsed.length} rule(s)`))
 }
 
 /* ------------------------------------------------------------------ */
@@ -459,11 +496,14 @@ program
   .command('sync')
   .description('Generate / refresh CLAUDE.md in the project root.')
   .action(
-    () =>
+    () => {
+      const opts = program.opts()
+      setVerbose(opts.verbose || false)
       void sync().catch((err) => {
         console.error(chalk.red('💥'), err)
         process.exit(1)
       })
+    }
   )
 
 program
@@ -472,19 +512,24 @@ program
     'Watch .cursor/rules/**/*.{md,mdc} and run “sync” on every change.'
   )
   .action(async () => {
+    const opts = program.opts()
+    setVerbose(opts.verbose || false)
+    
     await sync()
 
     const dir = join(process.cwd(), '.cursor', 'rules')
-    console.log(chalk.blue('👀 Watching .cursor/rules …  (Ctrl‑C to stop)'))
+    log(chalk.blue('👀 Watching .cursor/rules …  (Ctrl‑C to stop)'))
+    logVerbose(`Watching directory: ${dir}`)
 
     watchFs(dir, { recursive: true }, async (_evt, filename) => {
       if (
         filename &&
         SUPPORTED_EXTENSIONS.some((ext) => filename.endsWith(ext))
       ) {
-        console.log(
+        log(
           chalk.yellow(`↻  Change detected in ${filename} – re‑syncing…`)
         )
+        logVerbose(`File changed: ${filename}, Event: ${_evt}`)
         await sync()
       }
     })
@@ -496,7 +541,12 @@ program
     'List discovered rules, showing category and inline/import decision.'
   )
   .action(async () => {
+    const opts = program.opts()
+    setVerbose(opts.verbose || false)
+    
     const dir = join(process.cwd(), '.cursor', 'rules')
+    logVerbose(`Checking rules directory: ${dir}`)
+    
     if (!existsSync(dir)) {
       console.error(chalk.red('No .cursor/rules directory in this project.'))
       process.exitCode = 2
@@ -504,13 +554,15 @@ program
     }
 
     const files = await findRuleFiles(dir)
+    logVerbose(`Discovered ${files.length} files: ${files.map(f => relative(process.cwd(), f)).join(', ')}`)
+    
     if (!files.length) {
-      console.log(chalk.yellow('No rule files found.'))
+      log(chalk.yellow('No rule files found.'))
       process.exitCode = 3
       return
     }
 
-    console.log(chalk.blue(`Found ${files.length} rule file(s):\n`))
+    log(chalk.blue(`Found ${files.length} rule file(s):\n`))
     for (const f of files) {
       const rule = parseRuleFile(await readFile(f, 'utf8'), f)
       const type = getRuleType(rule)
@@ -521,19 +573,21 @@ program
         'manual': 'Manual'
       }
       const typeLabel = typeLabels[type] || type
+      const lineCount = rule.content.split('\n').length
       
-      console.log(
+      log(
         `${shouldInline(rule) ? chalk.yellow('[inline]') : chalk.blue('[import]')} ${rule.relativePath}`
       )
-      console.log(chalk.gray(`  ↳ Type: ${typeLabel}`))
+      log(chalk.gray(`  ↳ Type: ${typeLabel}`))
+      logVerbose(`  ↳ Lines: ${lineCount}, File size: ${rule.rawContent.length} bytes`)
       if (rule.frontmatter.description)
-        console.log(chalk.gray(`  ↳ ${rule.frontmatter.description}`))
+        log(chalk.gray(`  ↳ ${rule.frontmatter.description}`))
       const globs = normalizeGlobs(rule.frontmatter.globs)
       if (globs.length)
-        console.log(
+        log(
           chalk.gray(`  ↳ globs: ${globs.join(', ')}`)
         )
-      console.log('')
+      log('')
     }
   })
 
