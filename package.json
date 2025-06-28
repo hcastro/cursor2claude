@@ -1,6 +1,6 @@
 {
   "name": "cursor2claude",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI that syncs Cursor rules into Claude Code’s CLAUDE.md",
   "keywords": [
     "cursor",
