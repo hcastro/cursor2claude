@@ -80,23 +80,22 @@ cursor2claude status  # Check current sync status
 - **Agent-Selected Rules**: Context-specific rules with descriptions
 - **Other Rules**: Manual or auto rules without descriptions
 
-### How It Works
+### Visual Example
 
 cursor2claude transforms your Cursor rules into a single CLAUDE.md file:
 
 ```
-📁 .cursor/rules/                    ➜    📄 CLAUDE.md
-├── 📁 core-rules/                        ┌─────────────────────────────┐
-│   └── 📄 code-quality.mdc               │ ## 🌍 Always-Apply Rules    │
-│       (alwaysApply: true)               │ @.cursor/rules/core-rules/  │
-│                                         │   code-quality.mdc          │
-└── 📁 tool-rules/                        │                             │
-    ├── 📄 git-commit-assistant.mdc       │ ## 🤖 Agent-Selected Rules  │
-    │   (agent-selected)                  │ @.cursor/rules/tool-rules/  │
-    └── 📄 task-list-management.mdc       │   git-commit-assistant.mdc  │
-        (agent-selected)                  │ @.cursor/rules/tool-rules/  │
-                                          │   task-list-management.mdc  │
-                                          └─────────────────────────────┘
+.cursor/rules/                          →  CLAUDE.md
+├── core-rules/                            ┌─────────────────────────────────────────────────────┐
+│   └── code-quality.mdc                   │ ## 🌍 Always-Apply Rules                            │
+│       (alwaysApply: true)                │ @.cursor/rules/core-rules/code-quality.mdc          │
+│                                          │                                                     │
+└── tool-rules/                            │ ## 🤖 Agent-Selected Rules                          │
+    ├── git-commit-assistant.mdc           │ @.cursor/rules/tool-rules/git-commit-assistant.mdc  │
+    │   (agent-selected)                   │ @.cursor/rules/tool-rules/task-list-management.mdc  │
+    └── task-list-management.mdc           │                                                     │
+        (agent-selected)                   │                                                     │
+                                           └─────────────────────────────────────────────────────┘
 ```
 
 ---
